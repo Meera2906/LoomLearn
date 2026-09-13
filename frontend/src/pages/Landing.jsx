@@ -79,6 +79,98 @@ const STAGES = [
   { label: 'Workspace',   frame: 33, targetFrame: 36 },
 ]
 
+// ── Stage 1 Scattered Letters Configuration ────────────────────────────────
+const PEER_LEARNING_LINES = ['Peer', 'Learning']
+const ENGINEERED_LINES = ['Engineered', 'for you']
+
+function pseudoRandom(seed) {
+  const x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453
+  return x - Math.floor(x)
+}
+
+function renderScatteredText(lines, scatterProgress, seedBase = 1) {
+  // Count total non-space characters for smooth staggered liftoffs
+  let totalChars = 0
+  lines.forEach(line => {
+    for (const char of line) {
+      if (char !== ' ') totalChars++
+    }
+  })
+
+  let nonSpaceIdx = 0
+
+  return lines.map((line, lineIdx) => (
+    <span key={lineIdx} style={{ display: 'block', whiteSpace: 'nowrap' }}>
+      {Array.from(line).map((char, charIdx) => {
+        if (char === ' ') {
+          return (
+            <span key={charIdx} style={{ display: 'inline-block' }}>
+              &nbsp;
+            </span>
+          )
+        }
+
+        const currentIdx = nonSpaceIdx++
+
+        // Deterministic pseudo-random values for each letter
+        const s1 = pseudoRandom(currentIdx * 3 + seedBase * 17 + 1)
+        const s2 = pseudoRandom(currentIdx * 7 + seedBase * 23 + 2)
+        const s3 = pseudoRandom(currentIdx * 11 + seedBase * 31 + 3)
+        const s4 = pseudoRandom(currentIdx * 13 + seedBase * 41 + 5)
+
+        // Slow, organic cascade: letters lift off in a smooth delayed sequence
+        const charRatio = currentIdx / Math.max(1, totalChars - 1)
+        const letterStart = 0.04 + 0.28 * (charRatio * 0.65 + s4 * 0.35)
+
+        let t = 0
+        if (scatterProgress > letterStart) {
+          t = Math.min(1, (scatterProgress - letterStart) / (1 - letterStart))
+        }
+
+        // Soft, slow power curve: gentle onset, graceful slow drift
+        const ease = Math.pow(t, 1.8)
+
+        // Gentle dispersal distance (40px to 115px) and subtle tilt
+        const angle = s1 * Math.PI * 2
+        const distance = 40 + s2 * 75
+        const maxDeltaX = Math.cos(angle) * distance
+        const maxDeltaY = Math.sin(angle) * distance
+        const maxRot = (s3 - 0.5) * 38 // Gentle -19deg to +19deg tilt
+
+        const deltaX = (maxDeltaX * ease).toFixed(1)
+        const deltaY = (maxDeltaY * ease).toFixed(1)
+        const rot = (maxRot * ease).toFixed(1)
+        const scale = (1 + ease * 0.06).toFixed(2)
+
+        // Opacity stays high and visible longer so user actually experiences the slow scatter
+        const opacity = t === 0 ? 1 : Math.max(0, 1 - Math.pow(t, 2.2))
+        const blur = t > 0.4 ? (((t - 0.4) / 0.6) * 2.2).toFixed(1) : 0
+
+        const transformStyle = t === 0
+          ? undefined
+          : `translate3d(${deltaX}px, ${deltaY}px, 0) rotate(${rot}deg) scale(${scale})`
+
+        const filterStyle = blur > 0.2 ? `blur(${blur}px)` : undefined
+
+        return (
+          <span
+            key={charIdx}
+            style={{
+              display: 'inline-block',
+              transform: transformStyle,
+              opacity,
+              filter: filterStyle,
+              willChange: 'transform, opacity, filter',
+            }}
+          >
+            {char}
+          </span>
+        )
+      })}
+    </span>
+  ))
+}
+
 export default function Landing() {
   const navigate = useNavigate()
 
@@ -335,26 +427,49 @@ export default function Landing() {
     )
   }
 
-  // ── Stage 2 (Deep Focus) fast entry + extended center stay ────────────────
-  // 1. Enters fast from right (+35vw -> 0vw within first ~12% of scroll)
-  // 2. Stays locked in center (0vw) for the majority of the stage (screen time!)
-  // 3. Gracefully departs to left right before Concurrency loads
-  const stage2Progress = Math.max(0, Math.min(1, (scrollProgress - 0.15) / 0.44))
-  let stage2TranslateX = 0
-  if (stage2Progress < 0.12) {
-    // Fast entry
-    const t = stage2Progress / 0.12
-    stage2TranslateX = 35 * (1 - t)
-  } else if (stage2Progress <= 0.88) {
-    // Extended stable dwell right in the center
-    const t = (stage2Progress - 0.12) / (0.88 - 0.12)
-    stage2TranslateX = 1 - t * 2
+  // ── Stage 1 Scatter Animation (Letter-by-letter dispersal on scroll) ──────
+  // As user scrolls, each letter in 'Peer Learning' and 'Engineered for you'
+  // scatters outward slowly and gracefully across an extended scroll range
+  const scatterProgress = Math.max(0, Math.min(1, scrollProgress / 0.36))
+
+  // ── Stage 2 (Deep Focus) Scroll-Driven Dynamic Slide-In & Slide-Out ───────
+  // Slides smoothly in from the right as user scrolls into the zero-gravity matcha frame,
+  // locks in center for clear reading, then slides out to the left
+  const s2Start = 0.20
+  const s2EnterEnd = 0.36
+  const s2ExitStart = 0.50
+  const s2End = 0.60
+
+  let stage2TranslateX = 55
+  let stage2Opacity = 0
+
+  if (scrollProgress >= s2Start && scrollProgress <= s2End) {
+    if (scrollProgress < s2EnterEnd) {
+      // Dynamic slide-in from right (+55vw -> 0vw)
+      const t = (scrollProgress - s2Start) / (s2EnterEnd - s2Start)
+      const ease = 1 - Math.pow(1 - t, 2.5)
+      stage2TranslateX = 55 * (1 - ease)
+      stage2Opacity = Math.min(1, t * 1.4)
+    } else if (scrollProgress <= s2ExitStart) {
+      // Center dwell with subtle micro-drift
+      const t = (scrollProgress - s2EnterEnd) / (s2ExitStart - s2EnterEnd)
+      stage2TranslateX = 0.5 - t * 1
+      stage2Opacity = 1
+    } else {
+      // Slide-out to left (0vw -> -55vw)
+      const t = (scrollProgress - s2ExitStart) / (s2End - s2ExitStart)
+      const ease = Math.pow(t, 2)
+      stage2TranslateX = -ease * 55
+      stage2Opacity = Math.max(0, 1 - t * 1.4)
+    }
+  } else if (scrollProgress < s2Start) {
+    stage2TranslateX = 55
+    stage2Opacity = 0
   } else {
-    // Departs right before next text loads
-    const t = (stage2Progress - 0.88) / (1 - 0.88)
-    stage2TranslateX = -1 - t * 44
+    stage2TranslateX = -55
+    stage2Opacity = 0
   }
-  const isStage2Active = stage2Progress >= 0.10 && stage2Progress <= 0.90
+  const isStage2Active = stage2Opacity >= 0.75
 
   return (
     <div className="ll-landing">
@@ -404,54 +519,46 @@ export default function Landing() {
               STAGE 1 (Frames 0–6): Split Text directly on the frame
               Top-Left corner + Bottom-Right corner
           ══════════════════════════════════════════════════════════════════ */}
-          {/* Top-Left Corner Text with glassmorphic outline directly on the title text */}
-          <div className={`ll-direct-tl${frameIndex <= 6 ? ' ll-direct--visible' : ''}`}>
-            <span className="ll-direct-eyebrow">✦ LOOMLEARN ACADEMIC PODS</span>
-            <div className="ll-title-outline-wrap">
-              <h1 className="ll-direct-title ll-text-glass-outline">
-                <span className="ll-font-peer-learning">Peer Learning,</span><br />
-                <span className="ll-font-engineered ll-text-glow-blue">Engineered for you</span>
-              </h1>
-            </div>
-            <p className="ll-direct-sub">
-              Connect with classmates who've aced your exact coursework.<br />
-              Live 1-on-1 and small study cohorts with verified peer mentors.
-            </p>
+          {/* Top-Left Corner: "Peer Learning" with slow letter-by-letter scatter */}
+          <div className={`ll-direct-tl${scrollProgress < 0.36 ? ' ll-direct--visible' : ''}`}>
+            <h1 className="ll-direct-title">
+              <span className="ll-font-peer-learning">
+                {renderScatteredText(PEER_LEARNING_LINES, scatterProgress, 1)}
+              </span>
+            </h1>
           </div>
 
-          {/* Bottom-Right Corner Actions without any glass container */}
-          <div className={`ll-direct-br${frameIndex <= 6 ? ' ll-direct--visible' : ''}`}>
-            <div className="ll-live-pulse-badge">
-              <span className="ll-pulse-circle" />
-              <span>LIVE SESSIONS ENROLLING NOW</span>
-            </div>
-            <div className="ll-direct-actions">
-              <button className="ll-btn-primary ll-btn-primary--lg" onClick={() => navigate('/register')}>
-                Start Learning Free →
-              </button>
-              <button className="ll-btn-ghost ll-btn-ghost--lg" onClick={() => navigate('/login')}>
-                Sign In
-              </button>
+          {/* Bottom-Right Corner: "Engineered for you" with slow letter-by-letter scatter */}
+          <div className={`ll-direct-br${scrollProgress < 0.36 ? ' ll-direct--visible' : ''}`}>
+            <div className="ll-engineered-wrap">
+              <span className="ll-font-engineered ll-engineered-text">
+                {renderScatteredText(ENGINEERED_LINES, scatterProgress, 2)}
+              </span>
             </div>
           </div>
 
           {/* ══════════════════════════════════════════════════════════════════
-              STAGE 2 (Frames 7–23): Deep Focus with Extended Screen Time & Dwell
+              STAGE 2 (Frames 7–23): Deep Focus with Dynamic Scroll Slide-In
               Directly on the floating zero-gravity matcha frame
           ══════════════════════════════════════════════════════════════════ */}
           <div
-            className={`ll-moving-marquee-wrap${frameIndex >= 7 && frameIndex <= 23 ? ' ll-direct--visible' : ''}`}
-            style={{ transform: `translate3d(${stage2TranslateX}vw, -50%, 0)` }}
+            className="ll-moving-marquee-wrap"
+            style={{
+              transform: `translate3d(${stage2TranslateX}vw, -50%, 0)`,
+              opacity: stage2Opacity,
+              pointerEvents: stage2Opacity > 0.4 ? 'auto' : 'none',
+              visibility: stage2Opacity > 0.01 ? 'visible' : 'hidden',
+            }}
           >
             <div className="ll-moving-marquee-inner">
-              <span className="ll-moving-badge">✦ ZERO-GRAVITY FOCUS</span>
+              <span className="ll-moving-badge">✦ DEEP FOCUS</span>
               <div className="ll-moving-title-wrap">
                 <h2 className={`ll-moving-title ll-moving-title--glass${isStage2Active ? ' ll-moving-title--active' : ''}`}>
-                  Distractions float away. Pure conceptual clarity.
+                  Deep Focus. Distractions float away.
                 </h2>
               </div>
               <p className="ll-moving-desc">
-                Capped study cohorts • Active mentor Q&A • Zero clutter
+                Pure conceptual clarity • Active mentor Q&A • Zero clutter
               </p>
             </div>
           </div>

@@ -130,9 +130,18 @@ export const LEARNER_PROFILE_BG = 'https://res.cloudinary.com/dmvsskquk/image/up
 export const MENTOR_PROFILE_BG = 'https://res.cloudinary.com/dmvsskquk/image/upload/v1789302301/72e884309875503675073180c47c2bb1_hrex23.jpg'
 
 // ============================================================================
-// 5. DASHBOARD WELCOME AVATAR
+// 5. DASHBOARD WELCOME AVATAR / ILLUSTRATIONS (ROLE-BASED)
 // ============================================================================
-export const DASHBOARD_AVATAR_URL = 'https://res.cloudinary.com/dmvsskquk/image/upload/v1789303998/student-management-stepping-stones-to-success-experts-share-strategies-for-mastering-business-life-relationships-predictive-analytics-student-821c2dbf7c610c3c568f543a98d7f1bc_zhxzr4.png'
+export const DASHBOARD_AVATAR_LEARNER = 'https://res.cloudinary.com/dmvsskquk/image/upload/v1789303998/student-management-stepping-stones-to-success-experts-share-strategies-for-mastering-business-life-relationships-predictive-analytics-student-821c2dbf7c610c3c568f543a98d7f1bc_zhxzr4.png'
+export const DASHBOARD_AVATAR_MENTOR = 'https://res.cloudinary.com/dmvsskquk/image/upload/v1789318720/Untitled_design_v0cscz.png'
+export const DASHBOARD_AVATAR_ADMIN = 'https://res.cloudinary.com/dmvsskquk/image/upload/v1789318811/Untitled_design_1_xsjjex.png'
+export const DASHBOARD_AVATAR_URL = DASHBOARD_AVATAR_LEARNER
+
+export const getDashboardAvatar = (role) => {
+  if (role === 'MENTOR') return DASHBOARD_AVATAR_MENTOR
+  if (role === 'ACADEMIC_ADMIN' || role === 'ADMIN') return DASHBOARD_AVATAR_ADMIN
+  return DASHBOARD_AVATAR_LEARNER
+}
 
 
 

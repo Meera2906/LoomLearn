@@ -9,7 +9,7 @@ import { getStats } from '../services/userService'
 import { getAll as getAllSessions } from '../services/sessionService'
 import { getMyEnrollments } from '../services/enrollmentService'
 import mockStore from '../services/mockDataStore'
-import { DASHBOARD_AVATAR_URL } from '../config/imageLinks'
+import { getDashboardAvatar } from '../config/imageLinks'
 
 function Home() {
   const user = useSelector((state) => state.auth.user)
@@ -266,37 +266,22 @@ function Home() {
           overflow: 'hidden',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flex: '1', minWidth: '280px', zIndex: 1, flexWrap: 'wrap' }}>
-          <div className="welcome-avatar-wrapper" style={{ position: 'relative', flexShrink: 0 }}>
-            <img
-              src={DASHBOARD_AVATAR_URL}
-              alt={displayName}
-              style={{
-                width: '68px',
-                height: '68px',
-                borderRadius: '50%',
-                objectFit: 'cover',
-                border: '2.5px solid rgba(147, 197, 253, 0.7)',
-                boxShadow: '0 0 20px rgba(66, 96, 229, 0.45), 0 4px 12px rgba(0, 0, 0, 0.5)',
-                display: 'block',
-                background: 'rgba(15, 23, 42, 0.6)',
-              }}
-            />
-            <span
-              style={{
-                position: 'absolute',
-                bottom: '2px',
-                right: '2px',
-                width: '14px',
-                height: '14px',
-                borderRadius: '50%',
-                background: '#10b981',
-                border: '2.5px solid #0f1424',
-                boxShadow: '0 0 8px #10b981',
-              }}
-              title="Active & Verified"
-            />
-          </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '22px', flex: '1', minWidth: '280px', zIndex: 1, flexWrap: 'wrap' }}>
+          <img
+            src={getDashboardAvatar(role)}
+            alt={`${role} Illustration`}
+            style={{
+              height: '92px',
+              width: 'auto',
+              maxHeight: '100px',
+              objectFit: 'contain',
+              flexShrink: 0,
+              filter: 'drop-shadow(0 8px 20px rgba(0, 0, 0, 0.45))',
+              display: 'block',
+              userSelect: 'none',
+              pointerEvents: 'none',
+            }}
+          />
 
           <div style={{ flex: '1', minWidth: '240px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
