@@ -77,7 +77,11 @@ export const getLandingFrameUrl = (index) => {
     return `${base}/frame_${num}.png`
   }
   if (LANDING_FRAME_LINKS[index] && LANDING_FRAME_LINKS[index].trim() !== '') {
-    return LANDING_FRAME_LINKS[index]
+    const url = LANDING_FRAME_LINKS[index]
+    if (url.includes('res.cloudinary.com') && url.includes('/upload/') && !url.includes('/upload/f_auto')) {
+      return url.replace('/upload/', '/upload/f_auto,q_auto:good,w_1600/')
+    }
+    return url
   }
   // Local fallback if no link configured
   const num = String(index + 1).padStart(3, '0')
@@ -118,3 +122,17 @@ export const PRESET_AVATAR_LINKS = [
   { label: 'Avatar 5', url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&auto=format&fit=crop&q=80' },
   { label: 'Avatar 6', url: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&auto=format&fit=crop&q=80' },
 ]
+
+// ============================================================================
+// 4. PROFILE BACKGROUND IMAGES (LEARNER & MENTOR)
+// ============================================================================
+export const LEARNER_PROFILE_BG = 'https://res.cloudinary.com/dmvsskquk/image/upload/v1789302301/c2474bb5b0f1e49db7d8ca395ec06f1b_jd7fro.jpg'
+export const MENTOR_PROFILE_BG = 'https://res.cloudinary.com/dmvsskquk/image/upload/v1789302301/72e884309875503675073180c47c2bb1_hrex23.jpg'
+
+// ============================================================================
+// 5. DASHBOARD WELCOME AVATAR
+// ============================================================================
+export const DASHBOARD_AVATAR_URL = 'https://res.cloudinary.com/dmvsskquk/image/upload/v1789303998/student-management-stepping-stones-to-success-experts-share-strategies-for-mastering-business-life-relationships-predictive-analytics-student-821c2dbf7c610c3c568f543a98d7f1bc_zhxzr4.png'
+
+
+

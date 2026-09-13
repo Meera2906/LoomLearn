@@ -62,12 +62,14 @@ function UserProfileModal({ isOpen, onClose }) {
 
   return (
     <div
+      className="frosted-modal-overlay"
       style={{
         position: 'fixed',
         inset: 0,
         zIndex: 9999,
-        background: 'rgba(5, 7, 15, 0.75)',
-        backdropFilter: 'blur(10px)',
+        background: 'rgba(5, 8, 20, 0.65)',
+        backdropFilter: 'blur(18px)',
+        WebkitBackdropFilter: 'blur(18px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -77,13 +79,16 @@ function UserProfileModal({ isOpen, onClose }) {
       onClick={onClose}
     >
       <div
+        className="frosted-glass-modal"
         style={{
           width: 'min(520px, 100%)',
-          background: 'linear-gradient(135deg, rgba(16, 20, 36, 0.95), rgba(11, 14, 25, 0.98))',
-          border: '1px solid rgba(120, 132, 215, 0.35)',
+          background: 'linear-gradient(135deg, rgba(20, 26, 54, 0.68), rgba(12, 16, 36, 0.78))',
+          backdropFilter: 'blur(28px) saturate(190%)',
+          WebkitBackdropFilter: 'blur(28px) saturate(190%)',
+          border: '1px solid rgba(255, 255, 255, 0.22)',
           borderRadius: '24px',
           padding: '28px',
-          boxShadow: '0 24px 60px rgba(0, 0, 0, 0.7), 0 0 35px rgba(66, 96, 229, 0.25)',
+          boxShadow: '0 24px 60px rgba(0, 0, 0, 0.65), 0 0 40px rgba(66, 96, 229, 0.28), inset 0 1px 1.5px rgba(255, 255, 255, 0.22)',
           position: 'relative',
           maxHeight: '90vh',
           overflowY: 'auto',

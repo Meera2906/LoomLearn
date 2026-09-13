@@ -17,12 +17,14 @@ import MentorProfiles from './pages/MentorProfiles'
 import SupportDashboard from './pages/SupportDashboard'
 import './App.css'
 
+import { LEARNER_PROFILE_BG, MENTOR_PROFILE_BG } from './config/imageLinks'
+
 function ProtectedRoute({ children }) {
   const token = useSelector((state) => state.auth.token)
   return token ? children : <Navigate to="/login" replace />
 }
 
-function AppRoutes() {
+function AppRoutes({ isLearner, isMentor }) {
   const dispatch = useDispatch()
   const token = useSelector((state) => state.auth.token)
   const user = useSelector((state) => state.auth.user)
@@ -60,10 +62,16 @@ function AppRoutes() {
     )
   }
 
+  const shellThemeClass = isLearner
+    ? 'learner-shell learner-theme glass-profile-theme'
+    : isMentor
+    ? 'mentor-shell mentor-theme glass-profile-theme'
+    : ''
+
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${shellThemeClass}`}>
       <Navbar user={user} />
-      <main className="page-shell">
+      <main className={`page-shell ${isLearner || isMentor ? 'profile-page-shell' : ''}`}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Home />} />
@@ -79,29 +87,69 @@ function AppRoutes() {
   )
 }
 
+function AppLayout() {
+  const token = useSelector((state) => state.auth.token)
+  const user = useSelector((state) => state.auth.user)
+  const role = user?.role || 'LEARNER'
+  const isLearner = Boolean(token && role === 'LEARNER')
+  const isMentor = Boolean(token && role === 'MENTOR')
+  const hasProfileTheme = isLearner || isMentor
+
+  const profileBg = isLearner
+    ? LEARNER_PROFILE_BG
+    : isMentor
+    ? MENTOR_PROFILE_BG
+    : null
+
+  return (
+    <div
+      className={`app-root-container ${isLearner ? 'learner-mode' : ''} ${
+        isMentor ? 'mentor-mode' : ''
+      }`}
+    >
+      {/* Background Image & Slight Darkening Overlay for Profile Pages */}
+      {profileBg && (
+        <div
+          className="profile-bg-layer"
+          style={{ backgroundImage: `url(${profileBg})` }}
+          aria-hidden="true"
+        >
+          <div className="profile-bg-overlay" />
+        </div>
+      )}
+
+      {/* Render DotField only where necessary (authenticated profile pages), NEVER on landing page */}
+      {token && hasProfileTheme && (
+        <div className="background-dotfield-wrapper">
+          <DotField
+            dotRadius={2.8}
+            dotSpacing={34}
+            cursorRadius={180}
+            bulgeStrength={75}
+            waveAmplitude={0}
+            baseColor="rgba(255, 255, 255, 0.18)"
+            activeGradientFrom="#93c5fd"
+            activeGradientTo="#60a5fa"
+            glowColor="#60a5fa"
+          />
+        </div>
+      )}
+
+      <AppRoutes isLearner={isLearner} isMentor={isMentor} />
+    </div>
+  )
+}
+
 function App() {
   return (
     <Provider store={store}>
       <BrowserRouter>
-        <div className="app-root-container">
-          <div className="background-dotfield-wrapper">
-            <DotField
-              dotRadius={3.0}
-              dotSpacing={32}
-              cursorRadius={180}
-              bulgeStrength={80}
-              waveAmplitude={0}
-              baseColor="rgba(255, 255, 255, 0.20)"
-              activeGradientFrom="#93c5fd"
-              activeGradientTo="#60a5fa"
-              glowColor="#60a5fa"
-            />
-          </div>
-          <AppRoutes />
-        </div>
+        <AppLayout />
       </BrowserRouter>
     </Provider>
   )
 }
 
 export default App
+
+

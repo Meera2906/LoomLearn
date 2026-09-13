@@ -14,12 +14,12 @@
   width: 100vw;
   height: 100vh;
   pointer-events: none;
-  z-index: 0;
+  z-index: 1;
 }
 
 .app-shell {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   width: min(1320px, calc(100vw - 32px));
   margin: 24px auto;
   padding: 0 0 32px;
@@ -1196,5 +1196,451 @@
   transform: translateY(-1px);
   box-shadow: 0 6px 22px rgba(83, 115, 255, 0.55);
 }
+
+/* ==========================================================================
+   AESTHETIC PROFILE THEMES (LEARNER & MENTOR) & FROSTED GLASSMORPHISM
+   ========================================================================== */
+
+/* Full-bleed fixed background layer */
+.profile-bg-layer,
+.learner-bg-layer {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  transform: translateZ(0);
+}
+
+/* Slight darkening overlay directly above the image for optimal contrast */
+.profile-bg-overlay,
+.learner-bg-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(8, 10, 20, 0.58) 0%,
+    rgba(10, 13, 26, 0.68) 50%,
+    rgba(7, 9, 18, 0.74) 100%
+  );
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+  pointer-events: none;
+}
+
+/* App shell for profile pages: transparent container so components sit directly above image and dotfield */
+.app-shell.learner-shell,
+.app-shell.mentor-shell {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+.app-shell.learner-shell::before,
+.app-shell.mentor-shell::before {
+  display: none !important;
+}
+
+.profile-page-shell,
+.learner-page-shell {
+  position: relative;
+  z-index: 2;
+}
+
+/* --- Profile Themes (Learner & Mentor): Frosted Glassmorphism --- */
+
+/* Frosted Navigation Bar */
+.glass-profile-theme .topbar,
+.learner-theme .topbar,
+.mentor-theme .topbar {
+  background: rgba(14, 18, 38, 0.55) !important;
+  backdrop-filter: blur(22px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(22px) saturate(190%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.18) !important;
+}
+
+.glass-profile-theme .nav-links a,
+.learner-theme .nav-links a,
+.mentor-theme .nav-links a {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 8px 16px;
+  transition: all 0.2s ease;
+}
+
+.glass-profile-theme .nav-links a:hover,
+.learner-theme .nav-links a:hover,
+.mentor-theme .nav-links a:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.22);
+  transform: translateY(-1px);
+}
+
+.glass-profile-theme .nav-links a.active,
+.learner-theme .nav-links a.active,
+.mentor-theme .nav-links a.active {
+  background: linear-gradient(135deg, rgba(66, 96, 229, 0.5), rgba(28, 33, 171, 0.6));
+  border-color: rgba(147, 197, 253, 0.5);
+  box-shadow: 0 4px 18px rgba(66, 96, 229, 0.45);
+}
+
+/* Frosted Welcome Banner (Learner & Mentor Dashboard) */
+.glass-profile-theme .welcome-banner,
+.learner-theme .welcome-banner,
+.mentor-theme .welcome-banner {
+  background: linear-gradient(
+    135deg,
+    rgba(28, 33, 171, 0.38) 0%,
+    rgba(18, 22, 48, 0.56) 100%
+  ) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 22px !important;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45), inset 0 1px 1.5px rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Frosted Stat Metric Cards */
+.glass-profile-theme .stat-card,
+.learner-theme .stat-card,
+.mentor-theme .stat-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(20, 26, 54, 0.48) 100%
+  ) !important;
+  backdrop-filter: blur(18px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(190%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.38), inset 0 1px 1.5px rgba(255, 255, 255, 0.22) !important;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease !important;
+}
+
+.glass-profile-theme .stat-card:hover,
+.learner-theme .stat-card:hover,
+.mentor-theme .stat-card:hover {
+  transform: translateY(-3px) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55), 0 0 25px rgba(96, 165, 250, 0.3) !important;
+}
+
+/* Frosted Horizontal Course & Enrollment Cards */
+.glass-profile-theme .enrollment-horizontal-card,
+.learner-theme .enrollment-horizontal-card,
+.mentor-theme .enrollment-horizontal-card {
+  background: rgba(18, 24, 52, 0.48) !important;
+  backdrop-filter: blur(18px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
+}
+
+.glass-profile-theme .enrollment-horizontal-card:hover,
+.glass-profile-theme .enrollment-horizontal-card:focus-visible,
+.learner-theme .enrollment-horizontal-card:hover,
+.learner-theme .enrollment-horizontal-card:focus-visible,
+.mentor-theme .enrollment-horizontal-card:hover,
+.mentor-theme .enrollment-horizontal-card:focus-visible {
+  transform: translateY(-4px) !important;
+  background: rgba(26, 36, 76, 0.62) !important;
+  border-color: rgba(255, 255, 255, 0.32) !important;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55), 0 0 30px rgba(66, 96, 229, 0.3) !important;
+}
+
+/* Frosted Session Cards */
+.glass-profile-theme .session-card,
+.learner-theme .session-card,
+.mentor-theme .session-card {
+  background: rgba(18, 24, 50, 0.48) !important;
+  backdrop-filter: blur(18px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
+}
+
+.glass-profile-theme .session-card:hover,
+.learner-theme .session-card:hover,
+.mentor-theme .session-card:hover {
+  transform: translateY(-4px) !important;
+  background: rgba(26, 36, 76, 0.62) !important;
+  border-color: rgba(255, 255, 255, 0.32) !important;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55), 0 0 30px rgba(66, 96, 229, 0.3) !important;
+}
+
+/* Frosted Subject Cards */
+.glass-profile-theme .subject-glass-card,
+.glass-profile-theme .subject-card,
+.learner-theme .subject-glass-card,
+.learner-theme .subject-card,
+.mentor-theme .subject-glass-card,
+.mentor-theme .subject-card {
+  background: rgba(18, 24, 50, 0.48) !important;
+  backdrop-filter: blur(18px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
+}
+
+.glass-profile-theme .subject-glass-card:hover,
+.glass-profile-theme .subject-card:hover,
+.learner-theme .subject-glass-card:hover,
+.learner-theme .subject-card:hover,
+.mentor-theme .subject-glass-card:hover,
+.mentor-theme .subject-card:hover {
+  transform: translateY(-4px) !important;
+  background: rgba(26, 36, 76, 0.62) !important;
+  border-color: rgba(255, 255, 255, 0.32) !important;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55), 0 0 30px rgba(66, 96, 229, 0.3) !important;
+}
+
+/* Mentor Tabs */
+.mentor-theme .mentor-session-tabs {
+  margin-bottom: 24px;
+}
+
+.mentor-theme .mentor-tab-pill {
+  background: rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #cbd5e1 !important;
+  border-radius: 12px !important;
+  transition: all 0.2s ease !important;
+}
+
+.mentor-theme .mentor-tab-pill:hover {
+  background: rgba(255, 255, 255, 0.14) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+}
+
+.mentor-theme .mentor-tab-pill.active {
+  background: linear-gradient(135deg, rgba(66, 96, 229, 0.55), rgba(28, 33, 171, 0.65)) !important;
+  border-color: rgba(147, 197, 253, 0.55) !important;
+  box-shadow: 0 4px 18px rgba(66, 96, 229, 0.45) !important;
+  color: #ffffff !important;
+}
+
+/* Frosted Analytics, Timeline & Section Panels */
+.glass-profile-theme .chart-card,
+.glass-profile-theme .timeline-card,
+.glass-profile-theme .glass-panel,
+.glass-profile-theme .glass-card,
+.glass-profile-theme .card:not(.welcome-banner):not(.stat-card),
+.learner-theme .chart-card,
+.learner-theme .timeline-card,
+.learner-theme .glass-panel,
+.learner-theme .glass-card,
+.learner-theme .card:not(.welcome-banner):not(.stat-card),
+.mentor-theme .chart-card,
+.mentor-theme .timeline-card,
+.mentor-theme .glass-panel,
+.mentor-theme .glass-card,
+.mentor-theme .card:not(.welcome-banner):not(.stat-card) {
+  background: rgba(18, 23, 48, 0.48) !important;
+  backdrop-filter: blur(18px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 22px !important;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.14) !important;
+}
+
+/* Frosted Search Bars, Inputs, Filters, Category Tabs */
+.glass-profile-theme .search-bar,
+.glass-profile-theme .search-box,
+.glass-profile-theme .filter-group,
+.glass-profile-theme .filter-bar,
+.glass-profile-theme .filter-section,
+.learner-theme .search-bar,
+.learner-theme .search-box,
+.learner-theme .filter-group,
+.learner-theme .filter-bar,
+.learner-theme .filter-section,
+.mentor-theme .search-bar,
+.mentor-theme .search-box,
+.mentor-theme .filter-group,
+.mentor-theme .filter-bar,
+.mentor-theme .filter-section {
+  background: rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 16px !important;
+}
+
+.glass-profile-theme input[type="text"],
+.glass-profile-theme input[type="search"],
+.glass-profile-theme select,
+.learner-theme input[type="text"],
+.learner-theme input[type="search"],
+.learner-theme select,
+.mentor-theme input[type="text"],
+.mentor-theme input[type="search"],
+.mentor-theme select {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  color: #ffffff !important;
+  border-radius: 12px !important;
+}
+
+.glass-profile-theme input[type="text"]:focus,
+.glass-profile-theme input[type="search"]:focus,
+.glass-profile-theme select:focus,
+.learner-theme input[type="text"]:focus,
+.learner-theme input[type="search"]:focus,
+.learner-theme select:focus,
+.mentor-theme input[type="text"]:focus,
+.mentor-theme input[type="search"]:focus,
+.mentor-theme select:focus {
+  border-color: rgba(147, 197, 253, 0.7) !important;
+  box-shadow: 0 0 16px rgba(96, 165, 250, 0.35) !important;
+  outline: none !important;
+}
+
+.glass-profile-theme .filter-tab-btn,
+.glass-profile-theme .tab-button,
+.glass-profile-theme .view-toggle-btn,
+.learner-theme .filter-tab-btn,
+.learner-theme .tab-button,
+.learner-theme .view-toggle-btn,
+.mentor-theme .filter-tab-btn,
+.mentor-theme .tab-button,
+.mentor-theme .view-toggle-btn {
+  background: rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #e2e8f0 !important;
+  border-radius: 12px !important;
+  transition: all 0.2s ease !important;
+}
+
+.glass-profile-theme .filter-tab-btn:hover,
+.glass-profile-theme .tab-button:hover,
+.glass-profile-theme .view-toggle-btn:hover,
+.learner-theme .filter-tab-btn:hover,
+.learner-theme .tab-button:hover,
+.learner-theme .view-toggle-btn:hover,
+.mentor-theme .filter-tab-btn:hover,
+.mentor-theme .tab-button:hover,
+.mentor-theme .view-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.14) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+}
+
+.glass-profile-theme .filter-tab-btn.active,
+.glass-profile-theme .tab-button.active,
+.glass-profile-theme .view-toggle-btn.active,
+.learner-theme .filter-tab-btn.active,
+.learner-theme .tab-button.active,
+.learner-theme .view-toggle-btn.active,
+.mentor-theme .filter-tab-btn.active,
+.mentor-theme .tab-button.active,
+.mentor-theme .view-toggle-btn.active {
+  background: linear-gradient(135deg, rgba(66, 96, 229, 0.5), rgba(28, 33, 171, 0.6)) !important;
+  border-color: rgba(147, 197, 253, 0.55) !important;
+  box-shadow: 0 4px 16px rgba(66, 96, 229, 0.4) !important;
+  color: #ffffff !important;
+}
+
+/* Frosted Tables */
+.glass-profile-theme .table-wrapper,
+.glass-profile-theme .enrollments-table-card,
+.learner-theme .table-wrapper,
+.learner-theme .enrollments-table-card,
+.mentor-theme .table-wrapper,
+.mentor-theme .enrollments-table-card {
+  background: rgba(18, 23, 48, 0.48) !important;
+  backdrop-filter: blur(18px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 20px !important;
+  overflow: hidden !important;
+}
+
+.glass-profile-theme table,
+.learner-theme table,
+.mentor-theme table {
+  background: transparent !important;
+}
+
+.glass-profile-theme th,
+.learner-theme th,
+.mentor-theme th {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #cbd5e1 !important;
+}
+
+.glass-profile-theme td,
+.learner-theme td,
+.mentor-theme td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.glass-profile-theme tr:hover td,
+.learner-theme tr:hover td,
+.mentor-theme tr:hover td {
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Frosted Modal Dialogs & Backdrops */
+.glass-profile-theme .modal-backdrop,
+.learner-theme .modal-backdrop,
+.mentor-theme .modal-backdrop,
+.frosted-modal-overlay {
+  background: rgba(6, 8, 20, 0.65) !important;
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+}
+
+.glass-profile-theme .modal-card,
+.learner-theme .modal-card,
+.mentor-theme .modal-card,
+.frosted-glass-modal {
+  background: linear-gradient(
+    135deg,
+    rgba(20, 26, 54, 0.72) 0%,
+    rgba(12, 16, 36, 0.82) 100%
+  ) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), 0 0 40px rgba(66, 96, 229, 0.3), inset 0 1px 1.5px rgba(255, 255, 255, 0.22) !important;
+}
+
+/* Frosted Empty State */
+.glass-profile-theme .empty-state,
+.learner-theme .empty-state,
+.mentor-theme .empty-state {
+  background: rgba(255, 255, 255, 0.04) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px dashed rgba(255, 255, 255, 0.18) !important;
+  border-radius: 20px !important;
+}
+
+
 
 

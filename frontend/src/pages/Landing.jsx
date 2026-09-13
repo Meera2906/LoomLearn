@@ -7,49 +7,69 @@ import './Landing.css'
 const TOTAL_FRAMES = 41
 const frames = getAllLandingFrameUrls()
 
-// ── Preload images with GPU decode ──────────────────────────────────────────
-function preloadFrames(onProgress) {
+// ── Preload images with GPU decode & Progressive streaming ──────────────────
+// ── Preload images with GPU decode & Progressive streaming ──────────────────
+function startProgressiveLoading(onFirstFrameReady, onProgress, onComplete) {
   let loaded = 0
   const images = new Array(TOTAL_FRAMES)
-  return new Promise((resolve) => {
-    frames.forEach((src, i) => {
+
+  const loadFrame = (index) => {
+    return new Promise((resolve) => {
       const img = new Image()
       img.crossOrigin = 'anonymous'
-      let finished = false
+      let done = false
 
-      const onDone = () => {
-        if (finished) return
-        finished = true
+      const finish = () => {
+        if (done) return
+        done = true
+        images[index] = img
         loaded++
-        images[i] = img
-        onProgress(loaded / TOTAL_FRAMES)
-        if (loaded === TOTAL_FRAMES) {
-          resolve(images)
-        }
+        if (onProgress) onProgress(loaded / TOTAL_FRAMES)
+        resolve(img)
       }
 
       const onError = () => {
-        // Fallback to local frame if remote link fails, before calling onDone
-        const fallbackSrc = `/Scroll_frames/frame_${String(i + 1).padStart(3, '0')}.png`
+        const fallbackSrc = `/Scroll_frames/frame_${String(index + 1).padStart(3, '0')}.png`
         if (img.src !== fallbackSrc && !img.src.endsWith(fallbackSrc)) {
-          img.onerror = onDone
-          img.onload = onDone
+          img.onerror = finish
+          img.onload = finish
           img.src = fallbackSrc
         } else {
-          onDone()
+          finish()
         }
       }
 
-      img.onload = onDone
+      img.onload = finish
       img.onerror = onError
-      img.src = src
+      img.src = frames[index]
 
       if ('decode' in img) {
-        img.decode().then(onDone).catch(onError)
+        img.decode().then(finish).catch(onError)
       }
     })
+  }
+
+  // 1. Load initial Frame 0 first and unlock the page immediately!
+  loadFrame(0).then(() => {
+    if (onFirstFrameReady) onFirstFrameReady(images)
+
+    // 2. High-priority batch: stage 1 frames (1..6)
+    const earlyBatch = [1, 2, 3, 4, 5, 6].map((idx) => loadFrame(idx))
+    Promise.all(earlyBatch).then(() => {
+      // 3. Stream remaining frames progressively in background
+      const remaining = []
+      for (let i = 7; i < TOTAL_FRAMES; i++) {
+        remaining.push(loadFrame(i))
+      }
+      Promise.all(remaining).then(() => {
+        if (onComplete) onComplete(images)
+      })
+    })
   })
+
+  return images
 }
+
 
 // ── Navigation Stage Anchors ────────────────────────────────────────────────
 const STAGES = [
@@ -127,23 +147,58 @@ export default function Landing() {
   const scrollZoneRef = useRef(null)
   const rafRef = useRef(null)
 
-  // ── Preload on mount ──────────────────────────────────────────────────────
+  // ── Progressive load on mount (Instant Frame 0 unlock) ────────────────────
   useEffect(() => {
-    preloadFrames((p) => setLoadProgress(p)).then((imgs) => {
-      loadedImagesRef.current = imgs
+    // Safety instant display timer: never block user for more than 200ms
+    const safetyTimer = setTimeout(() => {
       setReady(true)
-    })
+    }, 200)
+
+    startProgressiveLoading(
+      (imgs) => {
+        loadedImagesRef.current = imgs
+        clearTimeout(safetyTimer)
+        setReady(true)
+      },
+      (p) => setLoadProgress(p),
+      (imgs) => {
+        loadedImagesRef.current = imgs
+      }
+    )
+
+    return () => clearTimeout(safetyTimer)
   }, [])
 
-  // ── High-performance Canvas Cover Drawing ──────────────────────────────────
+  // ── High-performance Canvas Cover Drawing with nearest-frame fallback ──────
   const drawCoverFrame = useCallback((idx) => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d', { alpha: false })
     if (!ctx) return
 
-    const img = loadedImagesRef.current[idx]
+    // Find target frame or closest loaded frame
+    let img = loadedImagesRef.current[idx]
+    if (!img || !img.complete || img.naturalWidth === 0) {
+      for (let k = idx - 1; k >= 0; k--) {
+        const c = loadedImagesRef.current[k]
+        if (c && c.complete && c.naturalWidth > 0) {
+          img = c
+          break
+        }
+      }
+      if (!img || !img.complete || img.naturalWidth === 0) {
+        for (let k = idx + 1; k < TOTAL_FRAMES; k++) {
+          const c = loadedImagesRef.current[k]
+          if (c && c.complete && c.naturalWidth > 0) {
+            img = c
+            break
+          }
+        }
+      }
+    }
+
     if (!img || !img.complete || img.naturalWidth === 0) return
+
 
     const dpr = window.devicePixelRatio || 1
     const width = canvas.clientWidth || window.innerWidth
@@ -262,7 +317,7 @@ export default function Landing() {
     scrollToFrame(targetIdx)
   }
 
-  // ── Preloader ─────────────────────────────────────────────────────────────
+  // ── Preloader (Instant reveal as soon as initial frame arrives) ────────────
   if (!ready) {
     return (
       <div className="ll-loader">
@@ -272,9 +327,9 @@ export default function Landing() {
             LOOMLEARN
           </div>
           <div className="ll-loader__bar-wrap">
-            <div className="ll-loader__bar" style={{ width: `${loadProgress * 100}%` }} />
+            <div className="ll-loader__bar" style={{ width: `${Math.max(35, loadProgress * 100)}%` }} />
           </div>
-          <p className="ll-loader__label">Preparing cinematic experience… {Math.round(loadProgress * 100)}%</p>
+          <p className="ll-loader__label">Loading LoomLearn…</p>
         </div>
       </div>
     )
