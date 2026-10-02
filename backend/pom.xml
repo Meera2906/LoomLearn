@@ -71,6 +71,13 @@
             <version>8.3.0</version>
         </dependency>
 
+        <!-- PostgreSQL (NeonDB / Cloud Postgres) -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <!-- JWT -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
